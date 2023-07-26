@@ -65,7 +65,7 @@ local Advanced = {
 -- Get Update Function
 local UpdateMutator;
 for i, v in pairs(getgc()) do
-	if type(v) == 'function' and not is_synapse_function(v) and getinfo(v).name and getinfo(v).name == "updateMutator" then
+	if type(v) == 'function' and getinfo(v).name and getinfo(v).name == "updateMutator" then
 		UpdateMutator = v
 	end
 end
