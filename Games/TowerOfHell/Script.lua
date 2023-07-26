@@ -603,138 +603,141 @@ function RTXON(value, Update, Typef)
 		end
 	end
 end
--- Events
-Tasks[10] = workspace.ChildAdded:Connect(function(Child)
-	if Child.Name == 'tower' then
-		wait(1)
-		if Flag('RTX') == true then RTXON(false) wait(.5) RTXON(true) end
-		pcall(function()
-			workspace.tower.sections.start.floor.floor.Material = Enum.Material.Glass
-			workspace.tower.sections.start.floor.floor.Transparency = 0.8
+
+local function PostUI()
+	-- Events
+	Tasks[10] = workspace.ChildAdded:Connect(function(Child)
+		if Child.Name == 'tower' then
+			wait(1)
+			if Flag('RTX') == true then RTXON(false) wait(.5) RTXON(true) end
+			pcall(function()
+				workspace.tower.sections.start.floor.floor.Material = Enum.Material.Glass
+				workspace.tower.sections.start.floor.floor.Transparency = 0.8
+			end)
+		end
+	end)
+
+	Tasks[8] = game.ReplicatedStorage.mutatorChanged.OnClientEvent:Connect(function()
+		wait()
+		UpdateMutators()
+	end)
+
+	-- Lopps
+	function Tick()
+		SetValues(true)
+		return task.spawn(function()
+			while true do
+				SetValues()
+				task.wait(Flag('Tick') / 1000)
+			end
 		end)
 	end
-end)
 
-Tasks[8] = game.ReplicatedStorage.mutatorChanged.OnClientEvent:Connect(function()
-	wait()
+	function FastTick()
+		return task.spawn(function()
+			while true do
+				if UserInput:IsKeyDown(Enum.KeyCode.Space) and Flag('InfJump') then
+					task.spawn(function()
+						local Plat = Spawnplatform(1)
+						task.wait(.1)
+						Plat:Destroy()
+					end)
+				end
+				task.wait(Flag('FastTick') / 1000)
+			end
+		end)
+	end
+	Tasks[1] = FastTick()
+	Tasks[2] = Tick()
+
+	function EMERGENCY_STOP()
+		Window:Delete()
+		task.cancel(Tasks[1])
+		task.cancel(Tasks[2])
+		HandelNoClip(false)
+		HandeHitBoxExpander(false)
+		HandeEsp(false)
+		clearplatforms()
+		HandelAutoFarm(false)
+		HandleInv(false)
+		RTXON(false)
+		if Flag('Lighting') ~= 'Default' then  sethiddenproperty(game.Lighting,"Technology", 'Compatibility') end
+		game.Lighting.ExposureCompensation = 0.3
+		game.Lighting.TimeOfDay = '14'
+		game.Lighting.GlobalShadows = false
+		game.Lighting.ExposureCompensation = 0.3
+		workspace.tower.sections.start.floor.floor.Material = Enum.Material.Plastic
+		workspace.tower.sections.start.floor.floor.Transparency = 1
+		if workspace.Gravity ~= Char().Humanoid.JumpPower ~= Flag('Jump') then
+			--Char().Humanoid.JumpPower = CharValues.JumpPower
+		end
+		if Tasks[5] then
+			Tasks[5]:Disconnect()
+			Tasks[5] = nil
+		end
+		if Tasks[6] then
+			Tasks[6]:Disconnect()
+			Tasks[6] = nil
+		end
+		Window = nil
+	end
+
+
+	-------------
+	--| START |--
+	-------------
+	local VirtualUser=game:service'VirtualUser'
+	Tasks[6] = Player.Idled:connect(function()
+		if Flag('AntiAfk') then
+			VirtualUser:CaptureController()
+			VirtualUser:ClickButton2(Vector2.new())
+		end
+	end)
+
+	Tasks[5] = Mouse.Button1Down:connect(function()
+		if Mouse.Target and Flag('ClickDelete') ~= 'None' and UserInput:IsKeyDown(Flag('ClickDelete')) then
+			table.insert(Undo, 1, Mouse.Target:Clone())
+			Undo[Flag('UndoStorage')] = nil
+			Mouse.Target:Destroy()
+		elseif Mouse.Target and Flag('ClickTp') ~= 'None' and UserInput:IsKeyDown(Flag('ClickTp')) then
+			local Hum
+			if Flag('Instanttp') then 
+				Char():MoveTo(Mouse.Hit.p) 
+			else
+				Tweem:Create(Char().HumanoidRootPart, TweenInfo.new(1), {CFrame = CFrame.new(Mouse.Hit.p.X, Mouse.Hit.p.Y + 2, Mouse.Hit.p.Z), Velocity = Vector3.new()}):Play()
+			end
+		end
+	end)
+
+	if Flag('FpsCap') ~= 120 then setfpscap(Flag('FpsCap')) end 
+	if Flag('Shadows') ~= 120 then game.Lighting.GlobalShadows = true end 
+	if Flag('Lighting') ~= 'Default' then sethiddenproperty(game.Lighting,"Technology",Enum.Technology[Flag('Lighting')]) end 
+	game.Lighting.ExposureCompensation = Flag('Exposure')/10
+	game.Lighting.TimeOfDay = tostring(Flag('TimeOfDay'))
+	game.Lighting.GlobalShadows = Flag('Shadows')
+	pcall(function()
+		workspace.tower.sections.start.floor.floor.Material = Enum.Material.Glass
+		workspace.tower.sections.start.floor.floor.Transparency = 0.8
+	end)
+
+	if Flag('RTX') == true then
+		RTXON(true)
+		Player.PlayerGui.shop2.shop.items.settings.killparthue.slider.hueChanged.Event:Connect(function()
+			RTXON(false, true)
+		end)
+	end
+
+	if Flag('Noclip') then
+		Tasks[3] = game["Run Service"].Stepped:Connect(function()
+			for _, v in next, Player.Character:GetChildren() do
+				if v.ClassName == 'Part' then
+					v.CanCollide = false
+				end
+			end
+		end)
+	end
 	UpdateMutators()
-end)
-
--- Lopps
-function Tick()
-	SetValues(true)
-	return task.spawn(function()
-		while true do
-			SetValues()
-			task.wait(Flag('Tick') / 1000)
-		end
-	end)
 end
-
-function FastTick()
-	return task.spawn(function()
-		while true do
-			if UserInput:IsKeyDown(Enum.KeyCode.Space) and Flag('InfJump') then
-				task.spawn(function()
-					local Plat = Spawnplatform(1)
-					task.wait(.1)
-					Plat:Destroy()
-				end)
-			end
-			task.wait(Flag('FastTick') / 1000)
-		end
-	end)
-end
-Tasks[1] = FastTick()
-Tasks[2] = Tick()
-
-function EMERGENCY_STOP()
-	Window:Delete()
-	task.cancel(Tasks[1])
-	task.cancel(Tasks[2])
-	HandelNoClip(false)
-	HandeHitBoxExpander(false)
-	HandeEsp(false)
-	clearplatforms()
-	HandelAutoFarm(false)
-	HandleInv(false)
-	RTXON(false)
-	if Flag('Lighting') ~= 'Default' then  sethiddenproperty(game.Lighting,"Technology", 'Compatibility') end
-	game.Lighting.ExposureCompensation = 0.3
-	game.Lighting.TimeOfDay = '14'
-	game.Lighting.GlobalShadows = false
-	game.Lighting.ExposureCompensation = 0.3
-	workspace.tower.sections.start.floor.floor.Material = Enum.Material.Plastic
-	workspace.tower.sections.start.floor.floor.Transparency = 1
-	if workspace.Gravity ~= Char().Humanoid.JumpPower ~= Flag('Jump') then
-		--Char().Humanoid.JumpPower = CharValues.JumpPower
-	end
-	if Tasks[5] then
-		Tasks[5]:Disconnect()
-		Tasks[5] = nil
-	end
-	if Tasks[6] then
-		Tasks[6]:Disconnect()
-		Tasks[6] = nil
-	end
-	Window = nil
-end
-
-
--------------
---| START |--
--------------
-local VirtualUser=game:service'VirtualUser'
-Tasks[6] = Player.Idled:connect(function()
-	if Flag('AntiAfk') then
-		VirtualUser:CaptureController()
-		VirtualUser:ClickButton2(Vector2.new())
-	end
-end)
-
-Tasks[5] = Mouse.Button1Down:connect(function()
-	if Mouse.Target and Flag('ClickDelete') ~= 'None' and UserInput:IsKeyDown(Flag('ClickDelete')) then
-		table.insert(Undo, 1, Mouse.Target:Clone())
-		Undo[Flag('UndoStorage')] = nil
-		Mouse.Target:Destroy()
-	elseif Mouse.Target and Flag('ClickTp') ~= 'None' and UserInput:IsKeyDown(Flag('ClickTp')) then
-		local Hum
-		if Flag('Instanttp') then 
-			Char():MoveTo(Mouse.Hit.p) 
-		else
-			Tweem:Create(Char().HumanoidRootPart, TweenInfo.new(1), {CFrame = CFrame.new(Mouse.Hit.p.X, Mouse.Hit.p.Y + 2, Mouse.Hit.p.Z), Velocity = Vector3.new()}):Play()
-		end
-	end
-end)
-
-if Flag('FpsCap') ~= 120 then setfpscap(Flag('FpsCap')) end 
-if Flag('Shadows') ~= 120 then game.Lighting.GlobalShadows = true end 
-if Flag('Lighting') ~= 'Default' then sethiddenproperty(game.Lighting,"Technology",Enum.Technology[Flag('Lighting')]) end 
-game.Lighting.ExposureCompensation = Flag('Exposure')/10
-game.Lighting.TimeOfDay = tostring(Flag('TimeOfDay'))
-game.Lighting.GlobalShadows = Flag('Shadows')
-pcall(function()
-	workspace.tower.sections.start.floor.floor.Material = Enum.Material.Glass
-	workspace.tower.sections.start.floor.floor.Transparency = 0.8
-end)
-
-if Flag('RTX') == true then
-	RTXON(true)
-	Player.PlayerGui.shop2.shop.items.settings.killparthue.slider.hueChanged.Event:Connect(function()
-		RTXON(false, true)
-	end)
-end
-
-if Flag('Noclip') then
-	Tasks[3] = game["Run Service"].Stepped:Connect(function()
-		for _, v in next, Player.Character:GetChildren() do
-			if v.ClassName == 'Part' then
-				v.CanCollide = false
-			end
-		end
-	end)
-end
-UpdateMutators()
 
 return {
 	['Flags'] = Flags,
@@ -771,4 +774,5 @@ return {
 	['RandomBypass'] = function() Mathbypass('RandomReturn', 'RandReturn') end,
 	['CharValues'] = CharValues,
 	['Advanced'] = Advanced,
+	['PostUI'] = PostUI
 }
