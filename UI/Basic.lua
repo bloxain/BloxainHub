@@ -80,17 +80,19 @@ local function SearchElement(Text, Element)
 end
 
 local function SaveData(Table)
-	if not SaveFolder then
-		return
-	end
-	if not isfolder(SaveFolder) then
-		makefolder(SaveFolder)
-	end
-	writefile(SaveFolder..'/'..tostring(game.GameId)..'.Txt', game.HttpService:JSONEncode(Table))
+	pcall(function()
+		if not SaveFolder then
+			return
+		end
+		if not isfolder(SaveFolder) then
+			makefolder(SaveFolder)
+		end
+		writefile(SaveFolder..'/'..tostring(game.GameId)..'.Txt', game.HttpService:JSONEncode(Table))
+	end)
 end
 
 local function GetGlobalData()
-	pcall(function()
+	local success, result = pcall(function()
 		if not SaveFolder then
 			return
 		end
@@ -103,6 +105,10 @@ local function GetGlobalData()
 			writefile(SaveFolder..'/GobalUI.txt', game.HttpService:JSONEncode(NewData))
 		end}
 	end)
+
+	if not success then
+		return {Data = nil}
+	end
 end
 
 local UI = {Flags = {}, Theme = {Boarder = Color3.fromRGB(255, 255, 255)}}
