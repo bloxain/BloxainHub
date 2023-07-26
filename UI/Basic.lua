@@ -90,17 +90,19 @@ local function SaveData(Table)
 end
 
 local function GetGlobalData()
-	if not SaveFolder then
-		return
-	end
-	if not isfolder(SaveFolder) then
-		makefolder(SaveFolder)
-	end if not isfile(SaveFolder..'/GobalUI.txt') then
-		writefile(SaveFolder..'/GobalUI.txt', '[]')
-	end
-	return {Data = game.HttpService:JSONDecode(readfile(SaveFolder..'/GobalUI.txt')), Write = function(NewData)
-		writefile(SaveFolder..'/GobalUI.txt', game.HttpService:JSONEncode(NewData))
-	end}
+	pcall(function()
+		if not SaveFolder then
+			return
+		end
+		if not isfolder(SaveFolder) then
+			makefolder(SaveFolder)
+		end if not isfile(SaveFolder..'/GobalUI.txt') then
+			writefile(SaveFolder..'/GobalUI.txt', '[]')
+		end
+		return {Data = game.HttpService:JSONDecode(readfile(SaveFolder..'/GobalUI.txt')), Write = function(NewData)
+			writefile(SaveFolder..'/GobalUI.txt', game.HttpService:JSONEncode(NewData))
+		end}
+	end)
 end
 
 local UI = {Flags = {}, Theme = {Boarder = Color3.fromRGB(255, 255, 255)}}
@@ -178,10 +180,12 @@ function UI:Init()
 
 end
 function UI:MakeWindow(Table)
-	SaveFolder = Table.ConfigFolder 
-	if isfile(Table.ConfigFolder..'/'..game.GameId..'.Txt') then
-		UI.Flags = game.HttpService:JSONDecode(readfile(Table.ConfigFolder..'/'..game.GameId..'.Txt'))
-	end
+	SaveFolder = Table.ConfigFolder
+	pcall(function()
+		if isfile(Table.ConfigFolder..'/'..game.GameId..'.Txt') then
+			UI.Flags = game.HttpService:JSONDecode(readfile(Table.ConfigFolder..'/'..game.GameId..'.Txt'))
+		end
+	end)
 	local UIScreen = Instance.new("ScreenGui")
 	local Window = Instance.new("Frame")
 	local TopBar = Instance.new("Frame")
