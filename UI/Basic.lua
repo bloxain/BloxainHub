@@ -107,7 +107,7 @@ local function GetGlobalData()
 	end)
 
 	if not success then
-		return {Data = nil}
+		return 'Wont work'
 	end
 end
 
@@ -506,7 +506,7 @@ function UI:MakeWindow(Table)
 		end
 	end)
 	-- Scaleing by bloxian
-	if not GetGlobalData().Data['Movement'] then
+	if GetGlobalData() == 'Wont work' or not GetGlobalData().Data['Movement'] then
 		UI['Settings'] = {
 			Parent = Window,
 			Movement = {
