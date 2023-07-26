@@ -45,7 +45,7 @@ local function Round(number, idk)
 	number = number / idk
 	local decimal = number - math.floor(number)
 	if decimal >= .5 then
-		return math.ceil(number) * idkvs
+		return math.ceil(number) * idk
 	else
 		return math.floor(number) * idk
 	end
@@ -767,4 +767,8 @@ return {
 	['UpdateSizes'] = UpdateSizes,
 	['EMERGENCY_STOP'] = function() EMERGENCY_STOP() end,
 	['JoinDiscord'] = function() setclipboard('https://discord.gg/PPFYacGb2b') end,
+	['RTXBrightness'] = function(Value) RTXON(false, true) end,
+	['RandomBypass'] = function() Mathbypass('RandomReturn', 'RandReturn') end,
+	['CharValues'] = CharValues,
+	['Advanced'] = Advanced,
 }
