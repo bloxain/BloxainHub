@@ -505,8 +505,6 @@ function UI:MakeWindow(Table)
 			end
 		end
 	end)
-	-- Scaleing by bloxian
-	if GetGlobalData() == 'Wont work' or not GetGlobalData().Data['Movement'] then
 		UI['Settings'] = {
 			Parent = Window,
 			Movement = {
@@ -523,9 +521,6 @@ function UI:MakeWindow(Table)
 				ScaleWith = 10
 			}
 		}
-	else
-		UI['Settings'] = GetGlobalData().Data
-	end UI.Settings['Control'] = GetGlobalData
 	local Mouse = game.Players.LocalPlayer:GetMouse()
 	local InputService = game:GetService'UserInputService'
 	local TweenService = game.TweenService
