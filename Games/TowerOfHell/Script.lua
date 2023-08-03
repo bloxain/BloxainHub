@@ -33,10 +33,11 @@ object = {
 }
 -- Needed at the top
 local function Flag(flag)
-	if Flags[flag] then
-		return Flags[flag].Value
+	if _G.BloxainUIFlags[flag] then
+		return _G.BloxainUIFlags[flag].Value
 	end
 end
+
 
 local function Round(number, idk)
 	if not idk then
