@@ -80,35 +80,27 @@ local function SearchElement(Text, Element)
 end
 
 local function SaveData(Table)
-	pcall(function()
-		if not SaveFolder then
-			return
-		end
-		if not isfolder(SaveFolder) then
-			makefolder(SaveFolder)
-		end
-		writefile(SaveFolder..'/'..tostring(game.GameId)..'.Txt', game.HttpService:JSONEncode(Table))
-	end)
+	if not SaveFolder then
+		return
+	end
+	if not isfolder(SaveFolder) then
+		makefolder(SaveFolder)
+	end
+	writefile(SaveFolder..'/'..tostring(game.GameId)..'.Txt', game.HttpService:JSONEncode(Table))
 end
 
 local function GetGlobalData()
-	local success, result = pcall(function()
-		if not SaveFolder then
-			return
-		end
-		if not isfolder(SaveFolder) then
-			makefolder(SaveFolder)
-		end if not isfile(SaveFolder..'/GobalUI.txt') then
-			writefile(SaveFolder..'/GobalUI.txt', '[]')
-		end
-		return {Data = game.HttpService:JSONDecode(readfile(SaveFolder..'/GobalUI.txt')), Write = function(NewData)
-			writefile(SaveFolder..'/GobalUI.txt', game.HttpService:JSONEncode(NewData))
-		end}
-	end)
-
-	if not success then
-		return 'Wont work'
+	if not SaveFolder then
+		return
 	end
+	if not isfolder(SaveFolder) then
+		makefolder(SaveFolder)
+	end if not isfile(SaveFolder..'/GobalUI.txt') then
+		writefile(SaveFolder..'/GobalUI.txt', '[]')
+	end
+	return {Data = game.HttpService:JSONDecode(readfile(SaveFolder..'/GobalUI.txt')), Write = function(NewData)
+		writefile(SaveFolder..'/GobalUI.txt', game.HttpService:JSONEncode(NewData))
+	end}
 end
 
 local UI = {Flags = {}, Theme = {Boarder = Color3.fromRGB(255, 255, 255)}}
@@ -186,12 +178,10 @@ function UI:Init()
 
 end
 function UI:MakeWindow(Table)
-	SaveFolder = Table.ConfigFolder
-	pcall(function()
-		if isfile(Table.ConfigFolder..'/'..game.GameId..'.Txt') then
-			UI.Flags = game.HttpService:JSONDecode(readfile(Table.ConfigFolder..'/'..game.GameId..'.Txt'))
-		end
-	end)
+	SaveFolder = Table.ConfigFolder 
+	if isfile(Table.ConfigFolder..'/'..game.GameId..'.Txt') then
+		UI.Flags = game.HttpService:JSONDecode(readfile(Table.ConfigFolder..'/'..game.GameId..'.Txt'))
+	end
 	local UIScreen = Instance.new("ScreenGui")
 	local Window = Instance.new("Frame")
 	local TopBar = Instance.new("Frame")
@@ -505,6 +495,8 @@ function UI:MakeWindow(Table)
 			end
 		end
 	end)
+	-- Scaleing by bloxian
+	if not GetGlobalData().Data['Movement'] then
 		UI['Settings'] = {
 			Parent = Window,
 			Movement = {
@@ -521,6 +513,9 @@ function UI:MakeWindow(Table)
 				ScaleWith = 10
 			}
 		}
+	else
+		UI['Settings'] = GetGlobalData().Data
+	end UI.Settings['Control'] = GetGlobalData
 	local Mouse = game.Players.LocalPlayer:GetMouse()
 	local InputService = game:GetService'UserInputService'
 	local TweenService = game.TweenService
@@ -962,10 +957,10 @@ function UI:MakeWindow(Table)
 			end
 			return functions
 		end
-		
-		
-		
-		
+
+
+
+
 		function Tab:AddMutiToggle(Table)
 			local Toggled = 0
 			if Table.Default then
@@ -1038,7 +1033,7 @@ function UI:MakeWindow(Table)
 			elseif Toggled == 1 then
 				Slider.Position = UDim2.new(0, 12, 0, 0)
 				Slider.BackgroundColor3 = Colors.Idle
-				
+
 			end if game.TextService:GetTextSize(Clickable.Text, 15, Enum.Font.Legacy, Vector2.new(1000000000, 100000)).X > 358 then
 				Clickable.TextScaled = true
 			end
@@ -1064,7 +1059,7 @@ function UI:MakeWindow(Table)
 					Toggled = 1
 					Tweem:Create(Slider, ANIMSPEED, {Position = UDim2.fromOffset(12, 0), BackgroundColor3 = Colors.Idle}):Play()
 				end
-				
+
 				if Table.Flag then
 					UI.Flags[Table.Flag].Value = Toggled
 				end if Table.Callback then
@@ -2112,5 +2107,4 @@ function UI:MakeWindow(Table)
 	end
 	return WindowReturn
 end
-
 return UI
