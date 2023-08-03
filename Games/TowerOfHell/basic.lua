@@ -100,5 +100,5 @@ Credit:AddLabel('Credit to Robloxain_Pro & CPU_Accelerator and a little ChatGPT'
 Credit:AddButton({Name = 'Join Discord', Callback = Logic.JoinDiscord})
 
 game["Run Service"].Stepped:Connect(function()
-	Logic.Flags = UI.Flags
+	_G.BloxainUIFlags = UI.Flags
 end)
